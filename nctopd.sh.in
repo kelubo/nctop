@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# $Id: nctopd.sh.in,v 1.1.4.2 2005/01/25 16:45:48 becker Exp $
+
+args='-d -u nobody'
+pidfile='/var/run/nctopd.pid'
+
+case "$1" in
+start)
+        [ -x @sbindir@/nctopd ] && @sbindir@/nctopd ${args} && \
+	    echo -n ' nctopd'
+        ;;
+stop)
+        kill `cat ${pidfile}` && echo -n ' nctopd'
+        ;;
+*)
+        echo "Usage: `basename $0` {start|stop}" >&2
+        exit 64
+        ;;
+esac
+
+exit 0

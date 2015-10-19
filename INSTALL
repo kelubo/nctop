@@ -1,0 +1,99 @@
+$Id: INSTALL,v 1.1.4.6 2005/08/04 11:40:12 becker Exp $
+
+Basic Installation
+==================
+
+1. run the configure script ('./configure'). Resultants are the makefile and
+   the header 'config.h'
+
+2. run 'make' to build the executables
+
+4. 'make install' installs the exectubables, the manual pages and 
+   the sample configuration file 
+
+5. copy the startup script in the appropriate place
+   (/etc/init.d /etc/local/rc.d ..)
+
+`configure' Options
+==================================
+
+The default path prefix is '/usr/local', resulting in the installation of 
+'nctop' in  '/usr/local/bin', 'nctopd' in '/usr/local/sbin', the configuration
+sample in '/usr/local/etc' and the manual pages in '/usr/local/man'.
+Use following options to choose an alternative layout:
+
+	--prefix	default: /usr/local
+        --bindir	default: $prefix/bin
+        --sbindir	default: $prefix/sbin
+        --mandir	default: $prefix/man
+        --sysconfdir	default: $prefix/etc
+
+	--with-port=VALUE   default port (default 5000)
+	--with-setgid=VALUE install daemon with setgid VALUE (default not used)
+	--with-libwrap	    use the wrapper library
+
+A note on the usage of libwrap
+===================================
+The host access file format support some extensions (see man hosts_options)
+which are not supported or may cause problems in case of UDP services.
+Keep the host access file in appropriate order to prevent libwrap from reading
+and applying one of these extensions, they may cause nctopd to abort.
+Nctopd is checking for a rule "nctopd :". 
+
+Some OS specific notes
+======================
+
+1. FreeBSD:
+   At FreeBSD systems the daemon uses the kvm-library and needs special 
+   privileges for the device /dev/kmem.
+   use: --with-setgid=kmem
+
+`configure' Invocation
+======================
+
+   `configure' recognizes the following options to control how it
+operates.
+
+`--help'
+`-h'
+     Print a summary of the options to `configure', and exit.
+
+`--version'
+`-V'
+     Print the version of Autoconf used to generate the `configure'
+     script, and exit.
+
+`--cache-file=FILE'
+     Enable the cache: use and save the results of the tests in FILE,
+     traditionally `config.cache'.  FILE defaults to `/dev/null' to
+     disable caching.
+
+`--config-cache'
+`-C'
+     Alias for `--cache-file=config.cache'.
+
+`--quiet'
+`--silent'
+`-q'
+     Do not print messages saying which checks are being made.  To
+     suppress all normal output, redirect it to `/dev/null' (any error
+     messages will still be shown).
+
+`--srcdir=DIR'
+     Look for the packages source code in directory DIR.  Usually
+     `configure' can determine that directory automatically.
+
+`configure' also accepts some other, not widely useful, options.  Run
+`configure --help' for more details.
+
+`make' Invocation
+===============
+
+Targets    Desc.
+-----------------------------------------------
+all        make all binaries and scripts
+clean      clean objects
+cleanall   clean objects and results from all
+install    install executables and manual pages
+deinstall  reverse install process
+distclean  clean all files from the `configure` run

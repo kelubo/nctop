@@ -1,0 +1,8 @@
+# this is the configuration file for nctop
+#
+# each line is the name of a host that will be probed by nctop
+
+localhost
+
+#host1
+#host2.mydomain.tld

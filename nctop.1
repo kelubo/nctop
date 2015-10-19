@@ -1,0 +1,64 @@
+.\" manual page for nctop
+.\" process this file with nroff -man nctop.1
+.\" 2005 Ralf Becker
+.\" $Id: nctop.1,v 1.1.2.1 2005/01/25 12:08:18 becker Exp $
+.TH nctop 1 "January 2005" "" "User Manual" 
+.SH NAME
+.B nctop 
+\- a remote system monitor
+.SH SYNOPSIS
+nctop [-bhV] [-f
+.I file
+] [-w 
+.I seconds
+] [-p 
+.I port
+]
+.SH DESCRIPTION
+Nctop is a client/server application to monitor the system state of
+remote hosts. The client probes every host listed in the
+configuration file and displays a line containing
+.P
+.RS
+- hostname
+.br
+- load averages (three samples)
+.br
+- CPU states (user/sys/idle)
+.br
+- real memory usage (used/free/total)
+.br
+- number of users currently logged in
+.br
+.RE
+.P
+Clearly, the client has only access to this information for hosts running
+the nctop daemon (nctopd).
+.SH OPTIONS
+.IP -b
+the host states are displayed once (batch mode)
+.IP -h
+display a one line usage information
+.IP -V
+version information
+.IP "-f file"
+read alternative configuration from
+.I file,
+then the default
+.I @sysconfdir@/nctop.conf
+.IP "-p port"
+contact the daemon on the given network port
+.IP "-w seconds"
+update the display every
+.I seconds
+seconds
+.SH FILES
+sysconfdir@/nctop.conf
+.RS
+the system-wide configuration file
+.SH BUGS
+no known bugs
+.SH AUTHOR
+This manual page was written by Ralf Becker <nctop@web.de>.
+.SH SEE ALSO
+.BR nctopd(1)

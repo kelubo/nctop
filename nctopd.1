@@ -1,0 +1,44 @@
+.\" manual page for nctopd
+.\" process this file with nroff -man nctopd.1
+.\" 2005 Ralf Becker
+.\" $Id: nctopd.1,v 1.1.2.1 2005/01/25 12:08:18 becker Exp $
+.TH nctopd 1 "January 2005" "" "User Manual" 
+.SH NAME
+.B nctop 
+\- a remote system monitor
+.SH SYNOPSIS
+nctopd [-dhV] [-u
+.I user
+] [-w 
+.I seconds
+] [-p 
+.I port
+]
+.SH DESCRIPTION
+Nctopd is the nctop daemon. It delivers on request the current system state to
+the client.
+.SH OPTIONS
+.IP -d
+daemon mode
+.IP -h 
+display a one line usage information
+.IP -V
+version information information
+.IP "-u user"
+nctopd will run with the user and group privileges of
+.I user.
+The usage of this option is recommended, if nctopd is run from 
+the root account.
+.IP "-p port"
+contact the daemon on network port 
+.I port
+.IP "-w seconds"
+update the host state every
+.I seconds 
+seconds
+.SH BUGS
+no known bugs
+.SH AUTHOR
+This manual page was written by Ralf Becker <nctop@web.de>.
+.SH SEE ALSO
+.BR nctop(1)

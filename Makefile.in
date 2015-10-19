@@ -1,0 +1,126 @@
+######################################
+# Makefile nctop
+# 2004 Ralf Becker
+# $Id: Makefile.in,v 1.6.2.9 2005/08/03 13:44:40 becker Exp $
+######################################
+
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+sbindir         = @sbindir@
+sysconfdir      = @sysconfdir@
+datadir		= @datadir@/nctop
+mandir		= @mandir@
+man1dir		= ${mandir}/man1
+
+CC		= @CC@
+CFLAGS		= @CFLAGS@ @DEFS@ -DSYSCONFDIR=\"$(sysconfdir)\"
+LD		= @CC@
+LDFLAGS		= @LDFLAGS@ @LIBS@
+LNCURSES	= @LNCURSES@
+LKVM		= @LKVM@
+LWRAP		= @LWRAP@
+MKDEPEND	= gcc 
+MKDFLAGS	= -M
+INSTALL		= @INSTALL@
+# the client flags
+INSTALLFLAGS_C	= -m 555 
+# the server flags
+INSTALLFLAGS_S	= @IFLAGS_S@
+# manpages/nctop.conf
+INSTALLFLAGS_M	= -m 444
+RM		= rm
+RMDIR		= rmdir
+GZIP		= gzip
+SED		= sed
+STRIP		= strip
+SHELL		= sh
+
+######################################
+# DO NOT EDIT BELOW
+######################################
+
+SOURCED	= utils.c daemon.c udpserver.c readline.c machine.c \
+	privileges.c nctopd.c 
+TARGETD	= nctopd
+
+SOURCEC = slist.c readconfig.c readline.c utils.c display.c \
+	udpclient.c nctop.c
+TARGETC = nctop
+
+MAN	= nctop.1 nctopd.1
+
+ADDON	= www/collectstat.pl www/plotstat.pl www/index.php www/README
+
+# TARGETS
+
+all:	${TARGETD} ${TARGETC} nctopd.sh
+
+${TARGETC}: ${SOURCEC:.c=.o}
+	${LD} ${LDFLAGS} -o $@ ${SOURCEC:.c=.o} ${LNCURSES} 
+
+${TARGETD}: ${SOURCED:.c=.o}
+	${LD} ${LDFLAGS} -o $@ ${SOURCED:.c=.o} $(LKVM) ${LWRAP} 
+
+nctopd.sh: nctopd.sh.in
+	${SED} 's,@sbindir\@,$(sbindir),g' nctopd.sh.in > $@
+
+clean:
+	-(${RM} ${SOURCEC:.c=.o})
+	-(${RM} ${SOURCED:.c=.o})
+
+cleanall: clean
+	-(${RM} ${TARGETC})
+	-(${RM} ${TARGETD})
+	-(${RM} nctopd.sh)
+
+install: strip ${TARGETC} ${TARGETD} install-man install-addon
+	${INSTALL} ${INSTALLFLAGS_C} ${TARGETC} ${bindir}/
+	${INSTALL} ${INSTALLFLAGS_S} ${TARGETD} ${sbindir}/
+	${INSTALL} ${INSTALLFLAGS_M} nctop.conf.sample ${sysconfdir}/
+
+install-man: ${MAN}
+	for I in ${MAN}; do \
+		${INSTALL} ${INSTALLFLAGS_M} $$I ${man1dir}; \
+		${GZIP} ${man1dir}/$$I; \
+	done
+
+install-addon: ${ADDON}
+	${INSTALL} -d ${datadir}/www
+	for I in ${ADDON}; do \
+		${INSTALL} ${INSTALLFLAGS_M} $$I ${datadir}/www; \
+	done
+
+deinstall: deinstall-man deinstall-addon
+	-${RM} ${bindir}/${TARGETC} 
+	-${RM} ${sbindir}/${TARGETD} 
+	-${RM} ${sysconfdir}/nctop.conf.sample 
+
+deinstall-man:
+	for I in ${MAN}; do \
+		${RM} ${man1dir}/$$I".gz"; \
+	done
+
+deinstall-addon:
+	for I in ${ADDON}; do \
+		${RM} ${datadir}/$$I; \
+	done
+	-${RMDIR} ${datadir}/www
+	-${RMDIR} ${datadir}
+
+strip: ${TARGETC} ${TARGETD}
+	${STRIP} ${TARGETC} 
+	${STRIP} ${TARGETD}
+
+depend:
+	-${RM} .depend
+	for I in ${SOURCEC} ${SOURCED}; do \
+	${MKDEPEND} ${MKDFLAGS} $$I | \
+	${SED} -e 's/[^\]{1}$$/ \\/' -e '2,$$s/^[^:]*://' \
+	>> .depend; \
+	done
+
+distclean:
+	-(${RM} config.log config.h config.status config.cache)
+	-(${RM} machine.c) 
+	-(${RM} -r Makefile)

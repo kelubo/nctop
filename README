@@ -1,0 +1,35 @@
+$Id: README,v 1.1.4.2 2005/08/01 11:51:12 becker Exp $
+
+Introduction
+============
+
+Nctop probes the hosts listed in the configuration file 
+('/usr/local/etc/nctop.conf'). 
+These hosts have to run the nctop daemon (nctopd).
+
+Options
+=======
+nctop: [-hV] [-w sec] [-p port] [-f file]
+ -b batch mode
+ -h usage
+ -V version
+ -w update display every sec seconds
+ -p the daemon is listen at this port
+ -f read configuration from file
+
+nctopd [-dhV] [-p port] [-w sec] [-u user]
+  -d daemonize
+  -V version
+  -w update host state every sec seconds
+  -p bind to port port
+  -u run as the specified user
+
+nctopd.sh start|stop
+
+Installation
+============
+see the file INSTALL
+
+AddOns
+======
+directory www

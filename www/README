@@ -1,0 +1,42 @@
+$Id: README,v 1.1.2.2 2005/08/01 21:13:37 becker Exp $
+
+Introduction
+=============
+
+In this directory are some scripts to display the one day history of the
+load average and the used memory on a web page.
+Sure, they are not state of the art but they work for my site for a long time.
+
+If you decide to use them, follow the instructions above.
+
+Prerequisites
+=============
+Follow packages are required to run these scripts:
+- perl
+- php
+- gnuplot
+- nctop (the client will be sufficent, depending on your nctop.conf)
+
+Install
+=======
+1. Edit the variables 
+
+      NCTOPCONF - the full path to you configuration
+      NCTOP     - the full path to nctop
+      LOGDIR    - the place where you would like to store the data
+
+   in  index.php, collectstat.pl and plotstat.pl.
+
+2. Copy index.php in a directory accessible by your webserver. 
+   The script plotstat.pl should be copied to a directory where CGIs 
+   are searched.
+
+3. Add a line 
+
+*/10    *       *       *       *       PATH/collectstat.pl
+
+to your crontab. Then, collectstat.pl will be executed every 10 minutes.
+From collectstat.pl nctop is run in batch mode and the data displayed by nctop
+is stored to LOGDIR.
+
+4. Add a second line to your crontab to remove old data from LOGDIR

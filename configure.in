@@ -1,0 +1,174 @@
+# Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.59)
+AC_INIT(ITS Cluster Top, 0.23.2, Ralf Becker <nctop@web.de>)
+
+AC_CONFIG_SRCDIR([nctop.c])
+AC_CONFIG_HEADER([config.h])
+
+#  the features
+
+# change default port
+AC_SUBST(port)
+port=5000
+
+AC_MSG_CHECKING(default port)
+AC_ARG_WITH(port, [  --with-port=VALUE       default port (default 5000)],
+[ with_port=`expr $with_port : "\(^[[0-9]]*$\)"` > /dev/null 2>&1;
+case $with_port in
+	[[0-9]][[1-9]]*)
+		port=$with_port
+		;;
+	[[1-9]]*)
+		port=$with_port
+		;;
+	*)
+		AC_MSG_ERROR(["you must enter the default port, > 0"])
+		;;
+esac])
+AC_DEFINE_UNQUOTED(DEFAULT_PORT, $port, [The default port])
+AC_MSG_RESULT($port)
+
+# set special privileges on daemon
+AC_SUBST(setgid)
+# this is the standard mode for the daemon
+setgid=""
+
+AC_MSG_CHECKING(setgid usage)
+AC_ARG_WITH(setgid, [  --with-setgid=VALUE     install nctopd with setgid VALUE],
+[
+case $with_setgid in
+	no|NO) 
+		setgid=""
+		;;
+	yes|YES)
+		AC_MSG_ERROR(["missing value for --with-setgid"])
+		;;
+	*)
+		setgid=$with_setgid
+		;;
+esac])
+AC_MSG_RESULT($setgid)
+
+if test X_"$setgid" = X_; then 
+	IFLAGS_S="-m 555"
+else
+	IFLAGS_S="-m 2555 -g $setgid"
+fi;
+
+# libwrap usage
+AC_SUBST(lwrap)
+AC_MSG_CHECKING([wrapper library (-lwrap) usage])
+lwrap=0
+
+AC_ARG_WITH(libwrap, [  --with-libwrap=yes      use wrapper library],
+[ 
+case $with_libwrap in
+	no|NO)
+		lwrap=0;
+		;;
+	yes|YES)
+		lwrap=1;
+		AC_DEFINE_UNQUOTED(HAVE_LWRAP,  $lwrap, [use libwrap])
+		;;
+	*)
+		AC_MSG_ERROR(["specify --with-libwrap=yes, if you would like to use the wrapper library"])
+		;;
+esac;
+])
+
+if test X_"$lwrap" = X_1; then
+	with_lwrap="yes";
+else 
+	with_lwrap="no";
+fi;
+
+AC_MSG_RESULT($with_lwrap)
+
+# Check for hosttype
+
+AC_CANONICAL_HOST
+case $host in
+	*-*-freebsd*)
+		machine="freebsd"
+		with_kvm="yes"
+		;;
+	*-*-linux*)
+		machine="linux"
+		;;
+	*)
+		echo "unknown architecture" 1>&2
+		exit 1
+		;;
+esac
+	
+# Checks for programs.
+AC_PROG_CC
+# if we use GCC set the CFLAGS
+if test X_"$GCC" = X_"yes"; then
+        CFLAGS=$CFLAGS" -Wall -Wstrict-prototypes -Wunused"
+fi;
+AC_PROG_INSTALL
+
+# Checks for libraries.
+AC_CHECK_LIB([ncurses], [initscr],[LNCURSES="-lncurses"])
+
+if test X_"$with_kvm" = X_"yes"; then
+AC_CHECK_LIB([kvm], [kvm_open],[LKVM="-lkvm"])
+fi
+
+if test X_"$with_libwrap" = X_"yes"; then
+AC_CHECK_LIB([wrap], [request_init],[LWRAP="-lwrap"],
+[
+AC_MSG_ERROR([install wrapper library first])
+])
+fi
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h utmp.h])
+
+if test X_"$with_kvm" = X_"yes"; then
+AC_CHECK_HEADER([kvm.h],  [AC_DEFINE(HAVE_KVM_H)],
+[
+AC_MSG_ERROR([kvm.h not found (kernel memory interface)])
+])
+fi
+
+if test X_"$with_libwrap" = X_"yes"; then
+AC_CHECK_HEADER([tcpd.h], [AC_DEFINE(HAVE_TCPD_H)],
+[
+AC_MSG_ERROR([tcpd.h not found (wrapper library)])
+])
+fi
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_TYPE_UID_T
+AC_CHECK_TYPES([struct ldat],,,[#include <ncurses.h>])
+
+# Checks for declarations
+AC_CHECK_DECLS([setresuid])
+AC_CHECK_DECLS([setresgid])
+AC_CHECK_DECLS([getresuid])
+
+# Checks for library functions.
+AC_FUNC_FORK
+# Checks for library functions.
+AC_FUNC_FORK
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
+AC_TYPE_SIGNAL
+AC_FUNC_STRTOD
+AC_CHECK_FUNCS([bzero gethostbyname inet_ntoa select socket strerror strtol strtoul strncmp])
+
+
+AC_SUBST(LNCURSES LKVM LWRAP IFLAGS_S)
+AC_CONFIG_LINKS(machine.c:machines/$machine.c)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
